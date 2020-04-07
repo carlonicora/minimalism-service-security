@@ -32,7 +32,7 @@ class securityConfigurations extends abstractServiceConfigurations {
      * securityConfigurations constructor.
      */
     public function __construct() {
-        $this->httpHeaderSignature = getenv('HEADER_SIGNATURE') ?: 'Minimalism-Signature';
+        $this->httpHeaderSignature = getenv('MINIMALISM_SERVICE_SECURITY_HEADER_SIGNATURE') ?: 'Minimalism-Signature';
     }
 
     /**
