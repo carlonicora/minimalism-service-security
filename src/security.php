@@ -261,4 +261,14 @@ class security extends abstractService {
     public function setPrivateKey(?string $privateKey): void {
         $this->configData->privateKey = $privateKey;
     }
+
+    /**
+     *
+     */
+    public function destroyStatics() : void {
+        $this->configData->publicKey = null;
+        $this->configData->privateKey = null;
+        $this->configData->clientSecret = null;
+        $this->configData->clientId = null;
+    }
 }
