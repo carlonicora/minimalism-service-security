@@ -271,4 +271,12 @@ class security extends abstractService {
         $this->configData->clientSecret = null;
         $this->configData->clientId = null;
     }
+    /**
+     * @param int $bytes
+     * @return string
+     * @throws Exception
+     */
+    public function createEncryptedString(int $bytes): string {
+        return bin2hex(random_bytes($bytes));
+    }
 }
