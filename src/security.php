@@ -141,7 +141,7 @@ class security extends abstractService {
      * @param string $password
      * @return string
      */
-    public static function encryptPassword($password): string {
+    public function encryptPassword($password): string {
         return password_hash($password, PASSWORD_BCRYPT);
     }
 
@@ -152,7 +152,7 @@ class security extends abstractService {
      * @param string $hash
      * @return bool
      */
-    public static function decryptPassword($password, $hash): bool {
+    public function decryptPassword($password, $hash): bool {
         $returnValue = false;
 
         if (password_verify($password, $hash)){
@@ -168,7 +168,7 @@ class security extends abstractService {
      * @param $publicKey
      * @param $privateKey
      */
-    public static function generateApiKeys(&$publicKey, &$privateKey): void {
+    public function generateApiKeys(&$publicKey, &$privateKey): void {
         try {
             $publicKey = bin2hex(random_bytes(32));
             $privateKey = bin2hex(random_bytes(64));
