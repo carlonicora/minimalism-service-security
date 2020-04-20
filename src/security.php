@@ -4,13 +4,15 @@ namespace carlonicora\minimalism\services\security;
 use carlonicora\minimalism\core\services\abstracts\abstractService;
 use carlonicora\minimalism\core\services\factories\servicesFactory;
 use carlonicora\minimalism\core\services\interfaces\serviceConfigurationsInterface;
+use carlonicora\minimalism\modules\jsonapi\api\exceptions\entityNotFoundException;
+use carlonicora\minimalism\modules\jsonapi\api\exceptions\unauthorizedException;
 use carlonicora\minimalism\services\logger\traits\logger;
 use carlonicora\minimalism\services\security\configurations\securityConfigurations;
 use carlonicora\minimalism\services\security\errors\errors;
+use carlonicora\minimalism\services\security\exceptions\sessionExpiredException;
 use carlonicora\minimalism\services\security\interfaces\securityClientInterface;
 use carlonicora\minimalism\services\security\interfaces\securitySessionInterface;
 use Exception;
-use RuntimeException;
 
 class security extends abstractService {
     use logger;
@@ -79,10 +81,14 @@ class security extends abstractService {
      * @param $body
      * @param securityClientInterface $client
      * @param securitySessionInterface $session
+     * @throws unauthorizedException
      */
     public function validateSignature($signature, $verb, $uri, $body, securityClientInterface $client, securitySessionInterface $session): void {
         if (empty($signature)) {
-            throw new RuntimeException('Security violation: missing signature', 401);
+            $message = 'Security violation: missing signature. URI: "'. $uri . ', verb: ' . $verb . ', body: ' . print_r($body, true);
+            $this->loggerWriteError(errors::SIGNATURE_MISSED, $message, errors::LOGGER_SERVICE_NAME);
+
+            throw new unauthorizedException(errors::SIGNATURE_MISSED);
         }
 
         $this->configData->clientId = '';
@@ -97,20 +103,29 @@ class security extends abstractService {
             $this->configData->clientId = substr($signature, 0, 64);
             $time = substr($signature, 64, 10);
         } else {
-            throw new RuntimeException('Security violation: signature structure error', 401);
+            $message = 'Security violation: signature structure error. Signature length = ' . strlen($signature);
+            $this->loggerWriteError(errors::SIGNATURE_INCORRECT_STRUCTURE, $message, errors::LOGGER_SERVICE_NAME);
+
+            throw new unauthorizedException(errors::SIGNATURE_INCORRECT_STRUCTURE);
         }
 
         $timeNow = time();
         $timeDifference = $timeNow - $time;
 
         if ($timeDifference > 10 || $timeDifference < -10) {
-            throw new RuntimeException('Security violation: signature expired', 401);
+            $message = 'Security violation: signature expired. Time difference: ' . $timeDifference;
+            $this->loggerWriteError(errors::SIGNATURE_EXPIRED, $message, errors::LOGGER_SERVICE_NAME);
+
+            throw new unauthorizedException(errors::SIGNATURE_EXPIRED);
         }
 
         try {
             $this->configData->clientSecret = $client->getSecret($this->configData->clientId);
         } catch (Exception $e) {
-            throw new RuntimeException('Security violation: invalid client id', 401);
+            $message = 'Security violation: invalid client id "' . $this->configData->clientId . '"';
+            $this->loggerWriteError(errors::SIGNATURE_MISSED, $message, errors::LOGGER_SERVICE_NAME, $e);
+
+            throw new unauthorizedException(errors::INVALID_CLIENT, $e);
         }
 
         $this->configData->privateKey=null;
@@ -119,12 +134,21 @@ class security extends abstractService {
         if (!empty($this->configData->publicKey)){
             try {
                 $this->configData->privateKey = $session->getPrivateKey($this->configData->publicKey, $this->configData->clientId);
-            } catch (Exception $e) {
-                if ($e->getCode() === 2){
-                    throw new RuntimeException('Security violation: session expired', 401);
-                }
+            } catch (entityNotFoundException $notFoundException) {
+                $message = 'Security violation: session not found. Public key "' . $this->configData->publicKey . '". Client id "' . $this->configData->clientId . '"';
+                $this->loggerWriteError(errors::SESSION_NOT_FOUND, $message, errors::LOGGER_SERVICE_NAME, $notFoundException);
 
-                throw new RuntimeException('Security violation: session not found', 401);
+                throw new unauthorizedException(errors::SESSION_NOT_FOUND, $notFoundException);
+            } catch (sessionExpiredException $sessionExpiredException) {
+                $message = 'Security violation: session expired. Public key "' . $this->configData->publicKey . '". Client id "' . $this->configData->clientId . '"';
+                $this->loggerWriteError(errors::SESSION_EXPIRED, $message, errors::LOGGER_SERVICE_NAME, $sessionExpiredException);
+
+                throw new unauthorizedException(errors::SESSION_EXPIRED, $sessionExpiredException);
+            } catch (Exception $e) {
+                $message = 'Security violation: Unknown error. Public key "' . $this->configData->publicKey . '". Client id "' . $this->configData->clientId . '"';
+                $this->loggerWriteError(errors::SESSION_ERROR_UNKNOWN, $message, errors::LOGGER_SERVICE_NAME, $e);
+
+                throw new unauthorizedException(errors::SESSION_ERROR_UNKNOWN, $e);
             }
         }
 
@@ -134,8 +158,11 @@ class security extends abstractService {
 
         $validatedSignature = $this->generateSignature($verb, $uri, $body, $this->configData->clientId, $this->configData->clientSecret, $this->configData->publicKey, $this->configData->privateKey, $time);
 
-        if($validatedSignature !== $signature){
-            throw new RuntimeException('Security violation: signature error', 401);
+        if ($validatedSignature !== $signature) {
+            $message = 'Security violation: signatures mismatch. Real signture "' . $validatedSignature . '". Received signature "' . $signature . '"';
+            $this->loggerWriteError(errors::SIGNATURE_MISMATCH, $message, errors::LOGGER_SERVICE_NAME);
+
+            throw new unauthorizedException(errors::SIGNATURE_MISMATCH);
         }
     }
 
