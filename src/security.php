@@ -4,13 +4,17 @@ namespace carlonicora\minimalism\services\security;
 use carlonicora\minimalism\core\services\abstracts\abstractService;
 use carlonicora\minimalism\core\services\factories\servicesFactory;
 use carlonicora\minimalism\core\services\interfaces\serviceConfigurationsInterface;
+use carlonicora\minimalism\services\logger\traits\logger;
 use carlonicora\minimalism\services\security\configurations\securityConfigurations;
+use carlonicora\minimalism\services\security\errors\errors;
 use carlonicora\minimalism\services\security\interfaces\securityClientInterface;
 use carlonicora\minimalism\services\security\interfaces\securitySessionInterface;
 use Exception;
 use RuntimeException;
 
 class security extends abstractService {
+    use logger;
+
     /** @var securityConfigurations  */
     private securityConfigurations $configData;
 
@@ -271,12 +275,37 @@ class security extends abstractService {
         $this->configData->clientSecret = null;
         $this->configData->clientId = null;
     }
+
     /**
      * @param int $bytes
      * @return string
-     * @throws Exception
      */
     public function createEncryptedString(int $bytes): string {
-        return bin2hex(random_bytes($bytes));
+        try {
+            $result = random_bytes($bytes);
+        } catch (Exception $exception) {
+            $message = 'Entropy error. Could not generate random bytes. ' . $exception->getMessage();
+            $this->loggerWriteError(errors::ENTROPY_EXCEPTION, $message, errors::LOGGER_SERVICE_NAME, $exception);
+
+            $result = $this->randomString($bytes);
+        }
+
+        return bin2hex($result);
     }
+
+    /**
+     * @param int $length
+     * @return string
+     */
+    private function randomString(int $length): string {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $charactersLength = strlen($characters);
+        $randomString = '';
+        for ($i = 0; $i < $length; $i++) {
+            /** @noinspection RandomApiMigrationInspection */
+            $randomString .= $characters[mt_rand(0, $charactersLength - 1)];
+        }
+        return $randomString;
+    }
+
 }
