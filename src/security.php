@@ -30,6 +30,7 @@ class security extends abstractService {
 
         /** @noinspection PhpFieldAssignmentTypeMismatchInspection */
         $this->configData = $configData;
+        $this->loggerInitialise($services);
     }
 
     /**
