@@ -201,13 +201,8 @@ class security extends abstractService {
      * @param $privateKey
      */
     public function generateApiKeys(&$publicKey, &$privateKey): void {
-        try {
-            $publicKey = bin2hex(random_bytes(32));
-            $privateKey = bin2hex(random_bytes(64));
-        } catch (Exception $e){
-            $publicKey = null;
-            $privateKey = null;
-        }
+        $publicKey = $this->createEncryptedString(32);
+        $privateKey = $this->createEncryptedString(64);
     }
 
     /**
