@@ -20,10 +20,6 @@ class errors extends abstractErrors {
     /** @var int */
     public const INVALID_CLIENT = 6;
     /** @var int */
-    public const SESSION_EXPIRED = 7;
-    /** @var int */
-    public const SESSION_NOT_FOUND = 8;
-    /** @var int */
-    public const SESSION_ERROR_UNKNOWN = 9;
+    public const SESSION_ERROR_UNKNOWN = 7;
 
 }

@@ -4,15 +4,14 @@ namespace carlonicora\minimalism\services\security;
 use carlonicora\minimalism\core\services\abstracts\abstractService;
 use carlonicora\minimalism\core\services\factories\servicesFactory;
 use carlonicora\minimalism\core\services\interfaces\serviceConfigurationsInterface;
-use carlonicora\minimalism\modules\jsonapi\api\exceptions\entityNotFoundException;
-use carlonicora\minimalism\modules\jsonapi\api\exceptions\unauthorizedException;
 use carlonicora\minimalism\services\logger\traits\logger;
 use carlonicora\minimalism\services\security\configurations\securityConfigurations;
 use carlonicora\minimalism\services\security\errors\errors;
 use carlonicora\minimalism\services\security\exceptions\sessionExpiredException;
+use carlonicora\minimalism\services\security\exceptions\unauthorisedException;
 use carlonicora\minimalism\services\security\interfaces\securityClientInterface;
 use carlonicora\minimalism\services\security\interfaces\securitySessionInterface;
-use Exception;
+use Throwable;
 
 class security extends abstractService {
     use logger;
@@ -82,14 +81,14 @@ class security extends abstractService {
      * @param $body
      * @param securityClientInterface $client
      * @param securitySessionInterface $session
-     * @throws unauthorizedException
+     * @throws unauthorisedException
      */
     public function validateSignature($signature, $verb, $uri, $body, securityClientInterface $client, securitySessionInterface $session): void {
         if (empty($signature)) {
             $message = 'Security violation: missing signature. URI: "'. $uri . ', verb: ' . $verb . ', body: ' . print_r($body, true);
             $this->loggerWriteError(errors::SIGNATURE_MISSED, $message, errors::LOGGER_SERVICE_NAME);
 
-            throw new unauthorizedException(errors::SIGNATURE_MISSED);
+            throw new unauthorisedException(errors::SIGNATURE_MISSED);
         }
 
         $this->configData->clientId = '';
@@ -107,7 +106,7 @@ class security extends abstractService {
             $message = 'Security violation: signature structure error. Signature length = ' . strlen($signature);
             $this->loggerWriteError(errors::SIGNATURE_INCORRECT_STRUCTURE, $message, errors::LOGGER_SERVICE_NAME);
 
-            throw new unauthorizedException(errors::SIGNATURE_INCORRECT_STRUCTURE);
+            throw new unauthorisedException(errors::SIGNATURE_INCORRECT_STRUCTURE);
         }
 
         $timeNow = time();
@@ -117,16 +116,16 @@ class security extends abstractService {
             $message = 'Security violation: signature expired. Time difference: ' . $timeDifference;
             $this->loggerWriteError(errors::SIGNATURE_EXPIRED, $message, errors::LOGGER_SERVICE_NAME);
 
-            throw new unauthorizedException(errors::SIGNATURE_EXPIRED);
+            throw new unauthorisedException(errors::SIGNATURE_EXPIRED);
         }
 
         try {
             $this->configData->clientSecret = $client->getSecret($this->configData->clientId);
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             $message = 'Security violation: invalid client id "' . $this->configData->clientId . '"';
-            $this->loggerWriteError(errors::SIGNATURE_MISSED, $message, errors::LOGGER_SERVICE_NAME, $e);
+            $this->loggerWriteError(errors::INVALID_CLIENT, $message, errors::LOGGER_SERVICE_NAME, $e);
 
-            throw new unauthorizedException(errors::INVALID_CLIENT, $e);
+            throw new unauthorisedException(errors::INVALID_CLIENT, $e);
         }
 
         $this->configData->privateKey=null;
@@ -135,21 +134,13 @@ class security extends abstractService {
         if (!empty($this->configData->publicKey)){
             try {
                 $this->configData->privateKey = $session->getPrivateKey($this->configData->publicKey, $this->configData->clientId);
-            } catch (entityNotFoundException $notFoundException) {
-                $message = 'Security violation: session not found. Public key "' . $this->configData->publicKey . '". Client id "' . $this->configData->clientId . '"';
-                $this->loggerWriteError(errors::SESSION_NOT_FOUND, $message, errors::LOGGER_SERVICE_NAME, $notFoundException);
-
-                throw new unauthorizedException(errors::SESSION_NOT_FOUND, $notFoundException);
-            } catch (sessionExpiredException $sessionExpiredException) {
-                $message = 'Security violation: session expired. Public key "' . $this->configData->publicKey . '". Client id "' . $this->configData->clientId . '"';
-                $this->loggerWriteError(errors::SESSION_EXPIRED, $message, errors::LOGGER_SERVICE_NAME, $sessionExpiredException);
-
-                throw new unauthorizedException(errors::SESSION_EXPIRED, $sessionExpiredException);
-            } catch (Exception $e) {
+            } catch (unauthorisedException | sessionExpiredException $exception) {
+                throw $exception;
+            } catch (Throwable $e) {
                 $message = 'Security violation: Unknown error. Public key "' . $this->configData->publicKey . '". Client id "' . $this->configData->clientId . '"';
                 $this->loggerWriteError(errors::SESSION_ERROR_UNKNOWN, $message, errors::LOGGER_SERVICE_NAME, $e);
 
-                throw new unauthorizedException(errors::SESSION_ERROR_UNKNOWN, $e);
+                throw new unauthorisedException(errors::SESSION_ERROR_UNKNOWN, $e);
             }
         }
 
@@ -163,7 +154,7 @@ class security extends abstractService {
             $message = 'Security violation: signatures mismatch. Real signture "' . $validatedSignature . '". Received signature "' . $signature . '"';
             $this->loggerWriteError(errors::SIGNATURE_MISMATCH, $message, errors::LOGGER_SERVICE_NAME);
 
-            throw new unauthorizedException(errors::SIGNATURE_MISMATCH);
+            throw new unauthorisedException(errors::SIGNATURE_MISMATCH);
         }
     }
 
@@ -306,7 +297,7 @@ class security extends abstractService {
     public function createEncryptedString(int $bytes): string {
         try {
             $result = random_bytes($bytes);
-        } catch (Exception $exception) {
+        } catch (Throwable $exception) {
             $message = 'Entropy error. Could not generate random bytes. ' . $exception->getMessage();
             $this->loggerWriteError(errors::ENTROPY_EXCEPTION, $message, errors::LOGGER_SERVICE_NAME, $exception);
 
