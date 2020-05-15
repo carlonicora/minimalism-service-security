@@ -1,9 +1,9 @@
 <?php
-namespace carlonicora\minimalism\services\security\IInterfaces;
+namespace carlonicora\minimalism\services\security\Interfaces;
 
 use Exception;
 
-interface securityClientInterface {
+interface SSecurityClientInterface {
     /**
      * @param string $clientId
      * @return string

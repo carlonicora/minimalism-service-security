@@ -1,10 +1,10 @@
 <?php
-namespace carlonicora\minimalism\services\security\EExceptions;
+namespace carlonicora\minimalism\services\security\Exceptions;
 
 use RuntimeException;
 use Throwable;
 
-class sessionExpiredException extends RuntimeException {
+class SSessionExpiredException extends RuntimeException {
     /**
      * entityNotFoundException constructor.
      * @param string $code

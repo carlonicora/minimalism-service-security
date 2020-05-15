@@ -1,12 +1,12 @@
 <?php
-namespace carlonicora\minimalism\services\security\CConfigurations;
+namespace carlonicora\minimalism\services\security\Configurations;
 
 use carlonicora\minimalism\core\services\abstracts\abstractServiceConfigurations;
 use carlonicora\minimalism\core\services\factories\servicesFactory;
-use carlonicora\minimalism\services\security\IInterfaces\securityClientInterface;
-use carlonicora\minimalism\services\security\IInterfaces\securitySessionInterface;
+use carlonicora\minimalism\services\security\Interfaces\SSecurityClientInterface;
+use carlonicora\minimalism\services\security\Interfaces\SSecuritySessionInterface;
 
-class securityConfigurations extends abstractServiceConfigurations {
+class SSecurityConfigurations extends abstractServiceConfigurations {
     /** @var string  */
     public string $httpHeaderSignature;
 
@@ -22,11 +22,11 @@ class securityConfigurations extends abstractServiceConfigurations {
     /** @var string|null  */
     public ?string $privateKey=null;
 
-    /** @var securityClientInterface|null  */
-    public ?securityClientInterface $securityClient=null;
+    /** @var SSecurityClientInterface|null  */
+    public ?SSecurityClientInterface $securityClient=null;
 
-    /** @var securitySessionInterface|null  */
-    public ?securitySessionInterface $securitySession=null;
+    /** @var SSecuritySessionInterface|null  */
+    public ?SSecuritySessionInterface $securitySession=null;
 
     /**
      * securityConfigurations constructor.
