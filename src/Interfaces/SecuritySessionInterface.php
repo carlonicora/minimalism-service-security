@@ -1,9 +1,10 @@
 <?php
-namespace carlonicora\minimalism\services\security\Interfaces;
+namespace CarloNicora\Minimalism\Services\Security\Interfaces;
 
 use Exception;
 
-interface SSecuritySessionInterface {
+interface SecuritySessionInterface
+{
     /**
      * @param string $publicKey
      * @param string $clientId

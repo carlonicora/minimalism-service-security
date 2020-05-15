@@ -1,9 +1,10 @@
 <?php
-namespace carlonicora\minimalism\services\security\Errors;
+namespace CarloNicora\Minimalism\Services\Security\Errors;
 
-use carlonicora\minimalism\services\logger\abstracts\abstractErrors;
+use carlonicora\minimalism\Services\logger\Abstracts\AbstractErrors;
 
-class EErrors extends abstractErrors {
+class Errors extends AbstractErrors
+{
     /** @var string  */
     public const LOGGER_SERVICE_NAME = 'minimalism-service-security';
 
