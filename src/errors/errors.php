@@ -1,5 +1,5 @@
 <?php
-namespace carlonicora\minimalism\services\security\errors;
+namespace carlonicora\minimalism\services\security\EErrors;
 
 use carlonicora\minimalism\services\logger\abstracts\abstractErrors;
 

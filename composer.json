@@ -6,7 +6,7 @@
   "time": "2019-05-14",
   "license": "MIT",
   "type": "library",
-  "minimum-stability": "stable",
+  "minimum-stability": "beta",
   "authors": [
     {
       "name": "Carlo Nicora",
@@ -17,12 +17,20 @@
   ],
   "autoload": {
     "psr-4": {
-      "carlonicora\\minimalism\\services\\security\\":"src/"
+      "CarloNicora\\Minimalism\\Services\\Security\\":"src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "CarloNicora\\Minimalism\\Services\\Security\\Tests\\":"tests/"
     }
   },
   "require": {
     "php": "^7.4",
     "ext-json": "*",
-    "carlonicora/minimalism": "~10.0"
+    "carlonicora/minimalism": "~11.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9"
   }
 }

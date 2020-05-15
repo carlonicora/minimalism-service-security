@@ -1,5 +1,5 @@
 <?php
-namespace carlonicora\minimalism\services\security\exceptions;
+namespace carlonicora\minimalism\services\security\EExceptions;
 
 use RuntimeException;
 use Throwable;

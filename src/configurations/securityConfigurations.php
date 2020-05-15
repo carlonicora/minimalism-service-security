@@ -1,10 +1,10 @@
 <?php
-namespace carlonicora\minimalism\services\security\configurations;
+namespace carlonicora\minimalism\services\security\CConfigurations;
 
 use carlonicora\minimalism\core\services\abstracts\abstractServiceConfigurations;
 use carlonicora\minimalism\core\services\factories\servicesFactory;
-use carlonicora\minimalism\services\security\interfaces\securityClientInterface;
-use carlonicora\minimalism\services\security\interfaces\securitySessionInterface;
+use carlonicora\minimalism\services\security\IInterfaces\securityClientInterface;
+use carlonicora\minimalism\services\security\IInterfaces\securitySessionInterface;
 
 class securityConfigurations extends abstractServiceConfigurations {
     /** @var string  */

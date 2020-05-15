@@ -1,5 +1,5 @@
 <?php
-namespace carlonicora\minimalism\services\security\interfaces;
+namespace carlonicora\minimalism\services\security\IInterfaces;
 
 use Exception;
 

@@ -7,11 +7,11 @@ use carlonicora\minimalism\core\services\interfaces\serviceConfigurationsInterfa
 use carlonicora\minimalism\modules\jsonapi\api\exceptions\entityNotFoundException;
 use carlonicora\minimalism\modules\jsonapi\api\exceptions\unauthorizedException;
 use carlonicora\minimalism\services\logger\traits\logger;
-use carlonicora\minimalism\services\security\configurations\securityConfigurations;
-use carlonicora\minimalism\services\security\errors\errors;
-use carlonicora\minimalism\services\security\exceptions\sessionExpiredException;
-use carlonicora\minimalism\services\security\interfaces\securityClientInterface;
-use carlonicora\minimalism\services\security\interfaces\securitySessionInterface;
+use carlonicora\minimalism\services\security\CConfigurations\securityConfigurations;
+use carlonicora\minimalism\services\security\EErrors\errors;
+use carlonicora\minimalism\services\security\EExceptions\sessionExpiredException;
+use carlonicora\minimalism\services\security\IInterfaces\securityClientInterface;
+use carlonicora\minimalism\services\security\IInterfaces\securitySessionInterface;
 use Exception;
 
 class security extends abstractService {
