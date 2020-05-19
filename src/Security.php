@@ -9,8 +9,8 @@ use CarloNicora\Minimalism\Services\Security\Events\SecurityErrorEvents;
 use CarloNicora\Minimalism\Services\Security\Exceptions\UnauthorisedException;
 use CarloNicora\Minimalism\Services\Security\Interfaces\SecurityClientInterface;
 use CarloNicora\Minimalism\Services\Security\Interfaces\SecuritySessionInterface;
+use Exception;
 use JsonException;
-use Throwable;
 
 class Security extends AbstractService {
     /** @var securityConfigurations  */
@@ -87,7 +87,7 @@ class Security extends AbstractService {
      * @param securityClientInterface $client
      * @param securitySessionInterface $session
      * @throws JsonException
-     * @throws Throwable
+     * @throws Exception|UnauthorisedException
      */
     public function validateSignature($signature, $verb, $uri, $body, securityClientInterface $client, securitySessionInterface $session): void {
         if (empty($signature)) {
@@ -124,7 +124,7 @@ class Security extends AbstractService {
 
         try {
             $this->configData->clientSecret = $client->getSecret($this->configData->clientId);
-        } catch (Throwable $e) {
+        } catch (Exception $e) {
             $this->services->logger()->error()
                 ->log(SecurityErrorEvents::INVALID_CLIENT($this->configData->clientId, $e))
                 ->throw(UnauthorisedException::class, 'Unathorised');
@@ -136,7 +136,7 @@ class Security extends AbstractService {
         if (!empty($this->configData->publicKey)){
             try {
                 $this->configData->privateKey = $session->getPrivateKey($this->configData->publicKey, $this->configData->clientId);
-            } catch (Throwable $e) {
+            } catch (Exception $e) {
                 $this->services->logger()->error()
                     ->log(SecurityErrorEvents::SESSION_ERROR_UNKNOWN($this->configData->clientId, $this->configData->publicKey, $e))
                     ->throw(UnauthorisedException::class, 'Unathorised');
@@ -295,9 +295,9 @@ class Security extends AbstractService {
     public function createEncryptedString(int $bytes): string {
         try {
             $result = random_bytes($bytes);
-        } catch (Throwable $exception) {
+        } catch (Exception $e) {
             $this->services->logger()->error()
-                ->log(SecurityErrorEvents::ENTROPY_EXCEPTION($exception->getMessage(), $exception));
+                ->log(SecurityErrorEvents::ENTROPY_EXCEPTION($e->getMessage(), $e));
 
             $result = $this->randomString($bytes);
         }

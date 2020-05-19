@@ -3,7 +3,7 @@ namespace CarloNicora\Minimalism\Services\Security\Events;
 
 use CarloNicora\Minimalism\Services\Logger\Interfaces\LogMessageInterface;
 use CarloNicora\Minimalism\Services\Logger\LogMessages\ErrorLogMessage;
-use Throwable;
+use Exception;
 
 class SecurityErrorEvents extends ErrorLogMessage
 {
@@ -24,12 +24,12 @@ class SecurityErrorEvents extends ErrorLogMessage
         return new self(4, 'Security violation: signature expired. Time difference: %d', [$timeDifference]);
     }
 
-    public static function INVALID_CLIENT(string $clientId, Throwable $e) : LogMessageInterface
+    public static function INVALID_CLIENT(string $clientId, Exception $e) : LogMessageInterface
     {
         return new self(6, 'Security violation: invalid client id: %s', [$clientId], $e);
     }
 
-    public static function SESSION_ERROR_UNKNOWN(string $clientId ,string $publicKey, Throwable $e) : LogMessageInterface
+    public static function SESSION_ERROR_UNKNOWN(string $clientId ,string $publicKey, Exception $e) : LogMessageInterface
     {
         return new self(7, 'Security violation: Unknown error. ClientId: %s PublicKey: %s', [$clientId, $publicKey], $e);
     }
@@ -39,7 +39,7 @@ class SecurityErrorEvents extends ErrorLogMessage
         return new self(5, 'Security violation: signatures mismatch. Computed signture: %s. Received signature: %s', [$computedSignature, $receivedSignature]);
     }
 
-    public static function ENTROPY_EXCEPTION(string $exceptionMessage, Throwable $e) : LogMessageInterface
+    public static function ENTROPY_EXCEPTION(string $exceptionMessage, Exception $e) : LogMessageInterface
     {
         return new self(1, 'Entropy error. Could not generate random bytes. %s', [$exceptionMessage], $e);
     }
