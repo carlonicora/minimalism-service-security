@@ -1,4 +1,5 @@
-<?php
+<?php /** @noinspection PhpDocRedundantThrowsInspection */
+
 namespace CarloNicora\Minimalism\Services\Security;
 
 use CarloNicora\Minimalism\Core\Services\Abstracts\AbstractService;

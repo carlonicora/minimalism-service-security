@@ -101,7 +101,7 @@ class SecurityTest extends AbstractTestCase
      */
     public function testFailToValidateSignatureNoSignature() : void
     {
-        $this->expectExceptionCode(2);
+        $this->expectExceptionCode(401);
 
         /** @var MockObject|SecurityClientInterface $securityClientInterface */
         $securityClientInterface = $this->getMockBuilder(SecurityClientInterface::class)->getMock();
@@ -119,7 +119,7 @@ class SecurityTest extends AbstractTestCase
      */
     public function testFailToValidateSignatureInvalidSignatureLength() : void
     {
-        $this->expectExceptionCode(3);
+        $this->expectExceptionCode(400);
 
         /** @var MockObject|SecurityClientInterface $securityClientInterface */
         $securityClientInterface = $this->getMockBuilder(SecurityClientInterface::class)->getMock();
@@ -145,7 +145,7 @@ class SecurityTest extends AbstractTestCase
         /** @var MockObject|SecuritySessionInterface $securityClientInterface */
         $securitySessionInterface = $this->getMockBuilder(SecuritySessionInterface::class)->getMock();
 
-        $this->expectExceptionCode(4);
+        $this->expectExceptionCode(400);
         /** @noinspection PhpParamsInspection */
         $this->security->validateSignature($signature, 'GET', '/uri', ['parameter'=>'value'], $securityClientInterface, $securitySessionInterface);
     }
@@ -164,7 +164,7 @@ class SecurityTest extends AbstractTestCase
         /** @var MockObject|SecuritySessionInterface $securityClientInterface */
         $securitySessionInterface = $this->getMockBuilder(SecuritySessionInterface::class)->getMock();
 
-        $this->expectExceptionCode(4);
+        $this->expectExceptionCode(400);
         /** @noinspection PhpParamsInspection */
         $this->security->validateSignature($signature, 'GET', '/uri', ['parameter'=>'value'], $securityClientInterface, $securitySessionInterface);
     }
@@ -188,7 +188,7 @@ class SecurityTest extends AbstractTestCase
         /** @var MockObject|SecuritySessionInterface $securityClientInterface */
         $securitySessionInterface = $this->getMockBuilder(SecuritySessionInterface::class)->getMock();
 
-        $this->expectExceptionCode(6);
+        $this->expectExceptionCode(400);
         /** @noinspection PhpParamsInspection */
         $this->security->validateSignature($signature, 'GET', '/uri', ['parameter'=>'value'], $securityClientInterface, $securitySessionInterface);
     }
@@ -221,7 +221,7 @@ class SecurityTest extends AbstractTestCase
         ->willReturn($this->privateKey);
          */
 
-        $this->expectExceptionCode(7);
+        $this->expectExceptionCode(400);
         /** @noinspection PhpParamsInspection */
         $this->security->validateSignature($signature, 'GET', '/uri', ['parameter'=>'value'], $securityClientInterface, $securitySessionInterface);
     }
@@ -250,7 +250,7 @@ class SecurityTest extends AbstractTestCase
         $securitySessionInterface->method('getPrivateKey')
             ->willReturn($this->privateKey);
 
-        $this->expectExceptionCode(5);
+        $this->expectExceptionCode(400);
         /** @noinspection PhpParamsInspection */
         $this->security->validateSignature('0' . substr($signature, 1), 'GET', '/uri', ['parameter'=>'value'], $securityClientInterface, $securitySessionInterface);
     }
@@ -282,7 +282,7 @@ class SecurityTest extends AbstractTestCase
         /** @noinspection PhpParamsInspection */
         $this->security->validateSignature($signature, 'GET', '/uri', null, $securityClientInterface, $securitySessionInterface);
 
-        $this->assertEquals(1,1);
+        $this->assertEquals(400,400);
     }
 
     public function testDecryptPassword() : void
