@@ -196,16 +196,16 @@ class Security extends AbstractService {
     }
 
     /**
-     * @return securityClientInterface
+     * @return securityClientInterface|null
      */
-    public function getSecurityClient(): securityClientInterface {
+    public function getSecurityClient(): ?securityClientInterface {
         return $this->configData->securityClient;
     }
 
     /**
-     * @return securitySessionInterface
+     * @return securitySessionInterface|null
      */
-    public function getSecuritySession(): securitySessionInterface {
+    public function getSecuritySession(): ?securitySessionInterface {
         return $this->configData->securitySession;
     }
 
