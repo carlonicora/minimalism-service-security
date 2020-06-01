@@ -5,6 +5,8 @@ namespace CarloNicora\Minimalism\Services\Security;
 use CarloNicora\Minimalism\Core\Services\Abstracts\AbstractService;
 use CarloNicora\Minimalism\Core\Services\Factories\ServicesFactory;
 use CarloNicora\Minimalism\Core\Services\Interfaces\ServiceConfigurationsInterface;
+use CarloNicora\Minimalism\Core\Traits\HttpHeadersTrait;
+use CarloNicora\Minimalism\Interfaces\SecurityInterface;
 use CarloNicora\Minimalism\Services\Security\Configurations\SecurityConfigurations;
 use CarloNicora\Minimalism\Services\Security\Events\SecurityErrorEvents;
 use CarloNicora\Minimalism\Services\Security\Exceptions\UnauthorisedException;
@@ -12,8 +14,12 @@ use CarloNicora\Minimalism\Services\Security\Interfaces\SecurityClientInterface;
 use CarloNicora\Minimalism\Services\Security\Interfaces\SecuritySessionInterface;
 use Exception;
 use JsonException;
+use Throwable;
 
-class Security extends AbstractService {
+class Security extends AbstractService implements SecurityInterface
+{
+    use HttpHeadersTrait;
+
     /** @var securityConfigurations  */
     private securityConfigurations $configData;
 
@@ -189,6 +195,7 @@ class Security extends AbstractService {
      *
      * @param $publicKey
      * @param $privateKey
+     * @throws Exception
      */
     public function generateApiKeys(&$publicKey, &$privateKey): void {
         $publicKey = $this->createEncryptedString(32);
@@ -292,6 +299,7 @@ class Security extends AbstractService {
     /**
      * @param int $bytes
      * @return string
+     * @throws Exception
      */
     public function createEncryptedString(int $bytes): string {
         try {
@@ -319,5 +327,40 @@ class Security extends AbstractService {
             $randomString .= $characters[mt_rand(0, $charactersLength - 1)];
         }
         return $randomString;
+    }
+
+    /**
+     * @param string $verb
+     * @param string $uri
+     * @param array|null $body
+     * @return bool
+     * @throws Exception|UnauthorisedException
+     */
+    public function isSignatureValid(string $verb, string $uri, array $body = null): bool
+    {
+        $signature = $this->getHeader($this->getHttpHeaderSignature());
+        try {
+            $this->validateSignature(
+                $signature,
+                $verb,
+                $uri,
+                $body,
+                $this->getSecurityClient(),
+                $this->getSecuritySession());
+        } catch (Throwable $e) {
+            $this->services->logger()->error()
+                ->log(SecurityErrorEvents::SIGNATURE_MISSED($uri, $verb, json_encode($body, JSON_THROW_ON_ERROR)));
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @return $this|SecurityInterface
+     */
+    public function getSecurityInterface(): SecurityInterface
+    {
+        return $this;
     }
 }

@@ -292,6 +292,9 @@ class SecurityTest extends AbstractTestCase
         $this->assertTrue($decryptedpassword);
     }
 
+    /**
+     * @throws Exception
+     */
     public function testGenerateApiKeys() : void
     {
         $public = null;
@@ -377,6 +380,9 @@ class SecurityTest extends AbstractTestCase
         $this->assertNull($this->security->getPrivateKey());
     }
 
+    /**
+     * @throws Exception
+     */
     public function testEntrophyError() : void
     {
         $log = $this->services->logger()->error()->log(SecurityErrorEvents::ENTROPY_EXCEPTION('', new Exception('')));
