@@ -294,6 +294,7 @@ class Security extends AbstractService implements SecurityInterface
         $this->configData->privateKey = null;
         $this->configData->clientSecret = null;
         $this->configData->clientId = null;
+        $this->headers = null;
     }
 
     /**
