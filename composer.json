@@ -1,12 +1,12 @@
 {
   "name": "carlonicora/minimalism-service-security",
   "description": "Security service for minimalism",
-  "version": "2.0.1-beta1",
+  "version": "2.0.1",
   "homepage": "https://carlonicora.com",
   "time": "2019-05-14",
   "license": "MIT",
   "type": "library",
-  "minimum-stability": "beta",
+  "minimum-stability": "stable",
   "authors": [
     {
       "name": "Carlo Nicora",
